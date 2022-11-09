@@ -36,12 +36,20 @@ exports.readAll = (callback) => {
 };
 
 exports.readOne = (id, callback) => {
-  var text = items[id];
-  if (!text) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback(null, { id, text });
-  }
+  // var text = items[id];
+  // if (!text) {
+  //   callback(new Error(`No item with id: ${id}`));
+  // } else {
+  //   callback(null, { id, text });
+  // }
+  fs.readFile(path.join(exports.dataDir, `${id}.txt`), (err, fileData) => {
+    if (err) {
+      //throw ('toDo is not exist')
+      callback(new Error('toDo is not exist'))
+    } else {
+      callback(null, { id, text: fileData.toString() });
+    }
+  })
 };
 
 exports.update = (id, text, callback) => {
