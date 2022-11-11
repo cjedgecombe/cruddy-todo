@@ -53,13 +53,47 @@ exports.readOne = (id, callback) => {
 };
 
 exports.update = (id, text, callback) => {
-  var item = items[id];
-  if (!item) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    items[id] = text;
-    callback(null, { id, text });
-  }
+  // var item = items[id];
+  // if (!item) {
+  //   callback(new Error(`No item with id: ${id}`));
+  // } else {
+  //   items[id] = text;
+  //   callback(null, { id, text });
+  // }
+
+  // bind result of calling readAll to a var
+  // if that array includes input ID
+  // do the below writeFile action with that ID
+  // else, throw the 'no item with id' error
+  //   exports.readAll((err, formattedData) => {
+  //   console.log(formattedData)
+  //   if (formattedData.forEach((item)=>{
+
+  //   })) {
+  //     fs.writeFile(path.join(exports.dataDir, `${id}.txt`), text, (err) => {
+  //       if (err) {
+  //         callback(new Error(`No item with id: ${id}`))
+  //       } else {
+  //         callback(null, { id, text })
+  //       }
+  //     })
+  //   }
+  // })
+  exports.readOne(id, (err, data) => {
+    if (err) {
+      callback(new Error(`No item with id: ${id}`))
+    } else {
+      fs.writeFile(path.join(exports.dataDir, `${id}.txt`), text, (err) => {
+        if (err) {
+          throw new Error('error updating file')
+        } else {
+          callback(null, { id, text })
+        }
+      })
+    }
+  })
+
+
 };
 
 exports.delete = (id, callback) => {
@@ -82,3 +116,16 @@ exports.initialize = () => {
     fs.mkdirSync(exports.dataDir);
   }
 };
+  // exports.readOne(id, (err, data) => {
+  //   if (err) {
+  //     callback(new Error(`No item with id: ${id}`))
+  //   } else {
+  //     fs.writeFile(path.join(exports.dataDir, `${id}.txt`), text, (err) => {
+  //       if (err) {
+  //         throw ('error writing counter')
+  //       } else {
+  //         callback(null, { id, text })
+  //       }
+  //     })
+  //   }
+  // })
