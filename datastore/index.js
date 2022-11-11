@@ -65,20 +65,7 @@ exports.update = (id, text, callback) => {
   // if that array includes input ID
   // do the below writeFile action with that ID
   // else, throw the 'no item with id' error
-  //   exports.readAll((err, formattedData) => {
-  //   console.log(formattedData)
-  //   if (formattedData.forEach((item)=>{
 
-  //   })) {
-  //     fs.writeFile(path.join(exports.dataDir, `${id}.txt`), text, (err) => {
-  //       if (err) {
-  //         callback(new Error(`No item with id: ${id}`))
-  //       } else {
-  //         callback(null, { id, text })
-  //       }
-  //     })
-  //   }
-  // })
   exports.readOne(id, (err, data) => {
     if (err) {
       callback(new Error(`No item with id: ${id}`))
@@ -97,14 +84,28 @@ exports.update = (id, text, callback) => {
 };
 
 exports.delete = (id, callback) => {
-  var item = items[id];
-  delete items[id];
-  if (!item) {
-    // report an error if item not found
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback();
-  }
+  // var item = items[id];
+  // delete items[id];
+  // if (!item) {
+  //   // report an error if item not found
+  //   callback(new Error(`No item with id: ${id}`));
+  // } else {
+  //   callback();
+  // }
+  exports.readOne(id, (err, data) => {
+    if (err) {
+      callback(new Error(`No item with id: ${id}`))
+    } else {
+      fs.unlink(path.join(exports.dataDir, `${id}.txt`), (err) => {
+        if (err) {
+          throw new Error('error deleting file')
+        } else {
+          callback()
+        }
+      })
+    }
+  })
+
 };
 
 // Config+Initialization code -- DO NOT MODIFY /////////////////////////////////
