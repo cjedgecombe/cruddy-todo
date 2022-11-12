@@ -21,18 +21,51 @@ exports.create = (text, callback) => {
     })
   });
 };
-
+// var data = _.map(items, (text, id) => {
+//   return { id, text };
+// });
+// callback(null, data);
+//1 readdir==> files dir[]
+//2.dir==>read files
+//3.all file get read==> invoke callback
+//[{promise},{promise}]
 exports.readAll = (callback) => {
-  // var data = _.map(items, (text, id) => {
-  //   return { id, text };
-  // });
-  // callback(null, data);
-  fs.readdir(exports.dataDir, (err, data) => {
-    var formattedData = data.map((item) => {
-      return { id: item.slice(0, -4), text: item.slice(0, -4) }
+
+  new Promise((resolve, reject) => {
+    fs.readdir(exports.dataDir, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
     })
+  }).then((data) => {
+    var promiseArray = data.map((item) => {
+      return new Promise((resolve, reject) => {
+        fs.readFile(path.join(exports.dataDir, `${item}`), 'utf8', (err, fileData) => {
+          if (err) {
+            reject(err)
+          } else {
+            var toDoObj = { id: item.slice(0, -4), text: fileData }
+            resolve(toDoObj)
+          }
+        })
+      })
+    })
+    return promiseArray
+  }).then((promiseArray) => {
+    return Promise.all(promiseArray)
+  }).then((formattedData) => {
     callback(null, formattedData)
   })
+
+  // fs.readdir(exports.dataDir, (err, data) => {
+  //   var formattedData = data.map((item) => {
+  //     return { id: item.slice(0, -4), text: item.slice(0, -4) }
+  //   })
+  //   callback(null, formattedData)
+  // })
+
 };
 
 exports.readOne = (id, callback) => {
